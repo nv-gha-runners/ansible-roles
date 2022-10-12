@@ -1,0 +1,26 @@
+---
+
+- block:
+  - name: Register architecture repository name (arm64)
+    ansible.builtin.set_fact:
+      arch_repo_name: "sbsa"
+    when: "ansible_architecture == 'aarch64'"
+
+  - name: Register architecture repository name (amd64)
+    ansible.builtin.set_fact:
+      arch_repo_name: "x86_64"
+    when: "ansible_architecture == 'x86_64'"
+
+  - name: Register driver major version
+    ansible.builtin.set_fact:
+      major_driver_version: "{{ driver_version.split('.')[0] }}"
+
+  - ansible.builtin.import_tasks: "ubuntu.yaml"
+    when: "ansible_distribution == 'Ubuntu'"
+
+  - ansible.builtin.import_tasks: "centos.yaml"
+    when: "ansible_distribution == 'Centos'"
+
+  - ansible.builtin.import_tasks: "amazon.yaml"
+    when: "ansible_distribution == 'Amazon'"
+  when: "gpu_node is defined and gpu_node"

@@ -1,0 +1,12 @@
+---
+
+- block:
+  - ansible.builtin.import_tasks: "ubuntu.yaml"
+    when: "ansible_distribution == 'Ubuntu'"
+
+  - ansible.builtin.import_tasks: "centos.yaml"
+    when: "ansible_distribution == 'Centos'"
+
+  - ansible.builtin.import_tasks: "amazon.yaml"
+    when: "ansible_distribution == 'Amazon'"
+  when: "gpu_node is defined and gpu_node"

@@ -1,0 +1,15 @@
+---
+
+- name: Register distribution repository name (Amazon)
+  ansible.builtin.set_fact:
+    distrib_repo_name: "amzn{{ ansible_distribution_major_version }}"
+
+- name: Add NVIDIA Container Toolkit repository (Amazon)
+  ansible.builtin.get_url:
+    url: "https://nvidia.github.io/libnvidia-container/{{ distrib_repo_name }}/libnvidia-container.repo"
+    dest: "/etc/yum.repos.d/nvidia-container-toolkit.repo"
+    mode: '0644'
+
+- name: Install NVIDIA Container Toolkit (Amazon)
+  ansible.builtin.yum:
+    name: "nvidia-container-toolkit"

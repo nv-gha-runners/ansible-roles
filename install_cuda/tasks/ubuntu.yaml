@@ -1,0 +1,63 @@
+---
+
+- name: Register distribution repository name (Ubuntu)
+  ansible.builtin.set_fact:
+    distrib_repo_name: "ubuntu{{ ansible_distribution_version | replace('.', '') }}"
+
+- name: Register driver major version (Ubuntu)
+  ansible.builtin.set_fact:
+    major_driver_version: "{{ driver_version.split('.')[0] }}"
+
+- name: Install cuda-keyring package (Ubuntu)
+  ansible.builtin.apt:
+    deb: "https://developer.download.nvidia.com/compute/cuda/repos/{{ distrib_repo_name }}/{{ arch_repo_name }}/cuda-keyring_1.0-1_all.deb"
+
+- name: Install CUDA and driver (Ubuntu)
+  ansible.builtin.apt:
+    allow_change_held_packages: yes
+    allow_downgrade: yes
+    autoremove: yes
+    update_cache: yes
+    pkg:
+      - "cuda-drivers-{{ major_driver_version }}={{ driver_version }}-*"
+      - "cuda-drivers={{ driver_version }}-*"
+      - "cuda-runtime-{{ cuda_version }}"
+      - "cuda-{{ cuda_version }}"
+      - "libnvidia-cfg1-{{ major_driver_version }}={{ driver_version }}-*"
+      - "libnvidia-compute-{{ major_driver_version }}={{ driver_version }}-*"
+      - "libnvidia-decode-{{ major_driver_version }}={{ driver_version }}-*"
+      - "libnvidia-encode-{{ major_driver_version }}={{ driver_version }}-*"
+      - "libnvidia-extra-{{ major_driver_version }}={{ driver_version }}-*"
+      - "libnvidia-fbc1-{{ major_driver_version }}={{ driver_version }}-*"
+      - "libnvidia-gl-{{ major_driver_version }}={{ driver_version }}-*"
+      - "libnvidia-ifr1-{{ major_driver_version }}={{ driver_version }}-*"
+      - "nvidia-compute-utils-{{ major_driver_version }}={{ driver_version }}-*"
+      - "nvidia-dkms-{{ major_driver_version }}={{ driver_version }}-*"
+      - "nvidia-driver-{{ major_driver_version }}={{ driver_version }}-*"
+      - "nvidia-kernel-source-{{ major_driver_version }}={{ driver_version }}-*"
+      - "nvidia-utils-{{ major_driver_version }}={{ driver_version }}-*"
+      - "xserver-xorg-video-nvidia-{{ major_driver_version }}={{ driver_version }}-*"
+
+- name: Mark CUDA and driver packages as hold (Ubuntu)
+  ansible.builtin.dpkg_selections:
+    selection: hold
+    name: "{{ item }}"
+  loop:
+      - "cuda-drivers-{{ major_driver_version }}"
+      - "cuda-drivers"
+      - "cuda-runtime-{{ cuda_version }}"
+      - "cuda-{{ cuda_version }}"
+      - "libnvidia-cfg1-{{ major_driver_version }}"
+      - "libnvidia-compute-{{ major_driver_version }}"
+      - "libnvidia-decode-{{ major_driver_version }}"
+      - "libnvidia-encode-{{ major_driver_version }}"
+      - "libnvidia-extra-{{ major_driver_version }}"
+      - "libnvidia-fbc1-{{ major_driver_version }}"
+      - "libnvidia-gl-{{ major_driver_version }}"
+      - "libnvidia-ifr1-{{ major_driver_version }}"
+      - "nvidia-compute-utils-{{ major_driver_version }}"
+      - "nvidia-dkms-{{ major_driver_version }}"
+      - "nvidia-driver-{{ major_driver_version }}"
+      - "nvidia-kernel-source-{{ major_driver_version }}"
+      - "nvidia-utils-{{ major_driver_version }}"
+      - "xserver-xorg-video-nvidia-{{ major_driver_version }}"

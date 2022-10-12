@@ -1,0 +1,20 @@
+---
+
+- name: Register distribution repository name (Amazon)
+  ansible.builtin.set_fact:
+    distrib_repo_name: "rhel7" # Always use RHEL 7 repositories for Amazon Linux
+
+- name: Add CUDA repository (Amazon)
+  ansible.builtin.get_url:
+    url: "https://developer.download.nvidia.com/compute/cuda/repos/{{ distrib_repo_name }}/{{ arch_repo_name }}/cuda-{{ distrib_repo_name }}.repo"
+    dest: "/etc/yum.repos.d/cuda.repo"
+    mode: '0644'
+
+- name: Enable EPEL packages (Amazon)
+  ansible.builtin.command: "amazon-linux-extras install epel -y"
+
+- name: Install CUDA and Driver (Amazon)
+  ansible.builtin.yum:
+    name:
+      - "nvidia-driver-branch-{{ major_driver_version }}-cuda-{{ driver_version }}"
+      - "cuda-{{ cuda_version }}"
