@@ -9,4 +9,13 @@
 
   - ansible.builtin.import_tasks: "amazon.yaml"
     when: "ansible_distribution == 'Amazon'"
+
+  - name: Register NVIDIA runtime
+    ansible.builtin.copy:
+      src: "containerd-config.toml"
+      dest: "/etc/eks/containerd/containerd-config.toml"
+      mode: 0644
+      owner: root
+      group: root
+    when: "register_nvidia_runtime is defined and register_nvidia_runtime"
   when: "gpu_node is defined and gpu_node"
