@@ -10,8 +10,7 @@
     dest: "/etc/yum.repos.d/cuda.repo"
     mode: '0644'
 
-- name: Install CUDA and Driver (CentOS)
+- name: Install driver (CentOS)
   ansible.builtin.yum:
     name:
       - "nvidia-driver-branch-${{ driver_version }}-cuda"
-      - "cuda-{{ cuda_version }}"

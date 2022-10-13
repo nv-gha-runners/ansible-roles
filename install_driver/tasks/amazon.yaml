@@ -13,8 +13,7 @@
 - name: Enable EPEL packages (Amazon)
   ansible.builtin.command: "amazon-linux-extras install epel -y"
 
-- name: Install CUDA and Driver (Amazon)
+- name: Install driver (Amazon)
   ansible.builtin.yum:
     name:
       - "nvidia-driver-branch-{{ major_driver_version }}-cuda-{{ driver_version }}"
-      - "cuda-{{ cuda_version }}"

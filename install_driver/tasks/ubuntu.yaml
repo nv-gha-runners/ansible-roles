@@ -12,17 +12,13 @@
   ansible.builtin.apt:
     deb: "https://developer.download.nvidia.com/compute/cuda/repos/{{ distrib_repo_name }}/{{ arch_repo_name }}/cuda-keyring_1.0-1_all.deb"
 
-- name: Install CUDA and driver (Ubuntu)
+- name: Install driver (Ubuntu)
   ansible.builtin.apt:
     allow_change_held_packages: yes
     allow_downgrade: yes
     autoremove: yes
     update_cache: yes
     pkg:
-      - "cuda-drivers-{{ major_driver_version }}={{ driver_version }}-*"
-      - "cuda-drivers={{ driver_version }}-*"
-      - "cuda-runtime-{{ cuda_version }}"
-      - "cuda-{{ cuda_version }}"
       - "libnvidia-cfg1-{{ major_driver_version }}={{ driver_version }}-*"
       - "libnvidia-compute-{{ major_driver_version }}={{ driver_version }}-*"
       - "libnvidia-decode-{{ major_driver_version }}={{ driver_version }}-*"
@@ -43,10 +39,6 @@
     selection: hold
     name: "{{ item }}"
   loop:
-      - "cuda-drivers-{{ major_driver_version }}"
-      - "cuda-drivers"
-      - "cuda-runtime-{{ cuda_version }}"
-      - "cuda-{{ cuda_version }}"
       - "libnvidia-cfg1-{{ major_driver_version }}"
       - "libnvidia-compute-{{ major_driver_version }}"
       - "libnvidia-decode-{{ major_driver_version }}"
