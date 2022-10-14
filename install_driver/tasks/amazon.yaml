@@ -13,6 +13,12 @@
 - name: Enable EPEL packages (Amazon)
   ansible.builtin.command: "amazon-linux-extras install epel -y"
 
+- name: Install driver dependencies (Amazon)
+  ansible.builtin.yum:
+    name:
+      - "kernel-devel-{{ ansible_kernel }}"
+      - "kernel-headers-{{ ansible_kernel }}"
+
 - name: Install driver (Amazon)
   ansible.builtin.yum:
     name:

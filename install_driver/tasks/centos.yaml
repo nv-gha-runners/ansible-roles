@@ -10,6 +10,12 @@
     dest: "/etc/yum.repos.d/cuda.repo"
     mode: '0644'
 
+- name: Install driver dependencies (CentOS)
+  ansible.builtin.yum:
+    name:
+      - "kernel-devel-{{ ansible_kernel }}"
+      - "kernel-headers-{{ ansible_kernel }}"
+
 - name: Install driver (CentOS)
   ansible.builtin.yum:
     name:
