@@ -35,7 +35,6 @@
 
 - name: Install driver (Ubuntu)
   ansible.builtin.apt:
-    allow_change_held_packages: yes
     allow_downgrade: yes
     autoremove: yes
     update_cache: yes
