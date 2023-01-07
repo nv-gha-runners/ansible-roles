@@ -33,6 +33,15 @@
   ansible.builtin.apt:
     deb: "https://developer.download.nvidia.com/compute/cuda/repos/{{ distrib_repo_name }}/{{ arch_repo_name }}/cuda-keyring_1.0-1_all.deb"
 
+- name: Unmark CUDA and driver packages as hold (Ubuntu)
+  ansible.builtin.dpkg_selections:
+    selection: install # install corresponds to "unhold"
+    name: "{{ item }}"
+  # The expression below appends '-<unhold_driver_version>'
+  # to every item in the 'pkgs' variable
+  loop: "{{ pkgs | product(['-' + unhold_driver_version]) | map('join') | list }}"
+  when: unhold_driver_version is defined
+
 - name: Install driver (Ubuntu)
   ansible.builtin.apt:
     allow_downgrade: yes
@@ -46,6 +55,6 @@
   ansible.builtin.dpkg_selections:
     selection: hold
     name: "{{ item }}"
-  # The expression below appends '-<major_driver_version>
+  # The expression below appends '-<major_driver_version>'
   # to every item in the 'pkgs' variable
   loop: "{{ pkgs | product(['-' + major_driver_version]) | map('join') | list }}"
