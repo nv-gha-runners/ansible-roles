@@ -1,0 +1,4 @@
+# This file is required for Ansible Galaxy
+galaxy_info:
+  company: NVIDIA
+  description: Common Ansible roles for the RAPIDS team at NVIDIA
