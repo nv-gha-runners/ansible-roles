@@ -1,5 +1,4 @@
 ---
-
 - name: Register distribution repository name (Ubuntu)
   ansible.builtin.set_fact:
     distrib_repo_name: "ubuntu{{ ansible_distribution_version | replace('.', '') }}"
@@ -8,46 +7,54 @@
   ansible.builtin.set_fact:
     major_driver_version: "{{ driver_version.split('.')[0] }}"
 
+- name: Register common CUDA driver packages
+  ansible.builtin.set_fact:
+    pkgs:
+      - libnvidia-cfg1
+      - libnvidia-compute
+      - libnvidia-decode
+      - libnvidia-encode
+      - libnvidia-extra
+      - libnvidia-fbc1
+      - libnvidia-gl
+      - nvidia-compute-utils
+      - nvidia-dkms
+      - nvidia-driver
+      - nvidia-kernel-source
+      - nvidia-utils
+      - xserver-xorg-video-nvidia
+
+- name: Append conditional CUDA driver packages (>=450,<=470)
+  when: (major_driver_version|int) >=450 and (major_driver_version|int) <= 470
+  ansible.builtin.set_fact:
+    pkgs: "{{ pkgs + ['libnvidia-ifr1'] }}"
+
 - name: Install cuda-keyring package (Ubuntu)
   ansible.builtin.apt:
     deb: "https://developer.download.nvidia.com/compute/cuda/repos/{{ distrib_repo_name }}/{{ arch_repo_name }}/cuda-keyring_1.0-1_all.deb"
 
+- name: Unmark CUDA and driver packages as hold (Ubuntu)
+  ansible.builtin.dpkg_selections:
+    selection: install # install corresponds to "unhold"
+    name: "{{ item }}"
+  # The expression below appends '-<unhold_driver_version>'
+  # to every item in the 'pkgs' variable
+  loop: "{{ pkgs | product(['-' + unhold_driver_version]) | map('join') | list }}"
+  when: unhold_driver_version is defined
+
 - name: Install driver (Ubuntu)
   ansible.builtin.apt:
-    allow_change_held_packages: yes
     allow_downgrade: yes
     autoremove: yes
     update_cache: yes
-    pkg:
-      - "libnvidia-cfg1-{{ major_driver_version }}={{ driver_version }}-*"
-      - "libnvidia-compute-{{ major_driver_version }}={{ driver_version }}-*"
-      - "libnvidia-decode-{{ major_driver_version }}={{ driver_version }}-*"
-      - "libnvidia-encode-{{ major_driver_version }}={{ driver_version }}-*"
-      - "libnvidia-extra-{{ major_driver_version }}={{ driver_version }}-*"
-      - "libnvidia-fbc1-{{ major_driver_version }}={{ driver_version }}-*"
-      - "libnvidia-gl-{{ major_driver_version }}={{ driver_version }}-*"
-      - "nvidia-compute-utils-{{ major_driver_version }}={{ driver_version }}-*"
-      - "nvidia-dkms-{{ major_driver_version }}={{ driver_version }}-*"
-      - "nvidia-driver-{{ major_driver_version }}={{ driver_version }}-*"
-      - "nvidia-kernel-source-{{ major_driver_version }}={{ driver_version }}-*"
-      - "nvidia-utils-{{ major_driver_version }}={{ driver_version }}-*"
-      - "xserver-xorg-video-nvidia-{{ major_driver_version }}={{ driver_version }}-*"
+    # The expression below appends '-<major_driver_version>=<driver_version>-*'
+    # to every item in the 'pkgs' variable
+    pkg: "{{ pkgs | product(['-' + major_driver_version + '=' + driver_version + '-*']) | map('join') | list }}"
 
 - name: Mark CUDA and driver packages as hold (Ubuntu)
   ansible.builtin.dpkg_selections:
     selection: hold
     name: "{{ item }}"
-  loop:
-      - "libnvidia-cfg1-{{ major_driver_version }}"
-      - "libnvidia-compute-{{ major_driver_version }}"
-      - "libnvidia-decode-{{ major_driver_version }}"
-      - "libnvidia-encode-{{ major_driver_version }}"
-      - "libnvidia-extra-{{ major_driver_version }}"
-      - "libnvidia-fbc1-{{ major_driver_version }}"
-      - "libnvidia-gl-{{ major_driver_version }}"
-      - "nvidia-compute-utils-{{ major_driver_version }}"
-      - "nvidia-dkms-{{ major_driver_version }}"
-      - "nvidia-driver-{{ major_driver_version }}"
-      - "nvidia-kernel-source-{{ major_driver_version }}"
-      - "nvidia-utils-{{ major_driver_version }}"
-      - "xserver-xorg-video-nvidia-{{ major_driver_version }}"
+  # The expression below appends '-<major_driver_version>'
+  # to every item in the 'pkgs' variable
+  loop: "{{ pkgs | product(['-' + major_driver_version]) | map('join') | list }}"
