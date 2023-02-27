@@ -18,8 +18,54 @@
     name:
       - "kernel-devel-{{ ansible_kernel }}"
       - "kernel-headers-{{ ansible_kernel }}"
+      - "gcc"
+      - "gcc10"
+      - "gcc10-c++"
+
+- name: Save old gcc version (Amazon)
+  ansible.builtin.copy:
+    src: "/usr/bin/{{ item }}"
+    dest: "/usr/bin/{{ item }}.old"
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: true
+  loop:
+    - "ar"
+    - "gcc"
+    - "ld"
+    - "objcopy"
+
+- name: Set gcc10 as default compiler (Amazon)
+  ansible.builtin.file:
+    src: "/usr/bin/gcc10-{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    owner: root
+    group: root
+    state: link
+    force: true
+  loop:
+    - "ar"
+    - "g++"
+    - "gcc"
+    - "ld"
+    - "objcopy"
 
 - name: Install driver (Amazon)
   ansible.builtin.yum:
     name:
       - "nvidia-driver-branch-{{ major_driver_version }}-cuda-{{ driver_version }}"
+
+- name: Restore old gcc version (Amazon)
+  ansible.builtin.copy:
+    src: "/usr/bin/{{ item }}.old"
+    dest: "/usr/bin/{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: true
+  loop:
+    - "ar"
+    - "gcc"
+    - "ld"
+    - "objcopy"
