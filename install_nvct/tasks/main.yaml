@@ -19,6 +19,11 @@
       group: root
     when: "register_nvidia_runtime is defined and register_nvidia_runtime"
 
+  - name: Check if Docker is installed
+    ansible.builtin.command: docker --version
+    register: check_docker_installed
+    ignore_errors: yes
+
   - name: Register NVIDIA runtime (docker)
     ansible.builtin.copy:
       src: "daemon.json"
@@ -26,5 +31,5 @@
       mode: 0644
       owner: root
       group: root
-    when: "register_nvidia_runtime is defined and register_nvidia_runtime"
+    when: "check_docker_installed.rc == 0 and register_nvidia_runtime is defined and register_nvidia_runtime"
   when: "gpu_node is defined and gpu_node"
