@@ -1,9 +1,5 @@
 ---
 
-- name: Register distribution repository name (Ubuntu)
-  ansible.builtin.set_fact:
-    distrib_repo_name: "ubuntu{{ ansible_distribution_version }}"
-
 - name: Add NVIDIA Container Toolkit repository key (Ubuntu)
   ansible.builtin.apt_key:
     url: "https://nvidia.github.io/libnvidia-container/gpgkey"
@@ -11,7 +7,7 @@
 
 - name: Add NVIDIA Container Toolkit repository (Ubuntu)
   ansible.builtin.apt_repository:
-    repo: "deb https://nvidia.github.io/libnvidia-container/stable/{{ distrib_repo_name }}/$(ARCH) /"
+    repo: "deb https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /"
     state: present
 
 - name: Install NVIDIA Container Toolkit (Ubuntu)
