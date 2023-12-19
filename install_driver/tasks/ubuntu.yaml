@@ -29,6 +29,11 @@
   ansible.builtin.set_fact:
     pkgs: "{{ pkgs + ['libnvidia-ifr1'] }}"
 
+- name: Append conditional CUDA driver packages (>=535)
+  when: (major_driver_version|int) >=535
+  ansible.builtin.set_fact:
+    pkgs: "{{ pkgs + ['libnvidia-common', 'nvidia-kernel-common'] }}"
+
 - name: Install cuda-keyring package (Ubuntu)
   ansible.builtin.apt:
     deb: "https://developer.download.nvidia.com/compute/cuda/repos/{{ distrib_repo_name }}/{{ arch_repo_name }}/cuda-keyring_1.0-1_all.deb"
